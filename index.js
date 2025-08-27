@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const cors = require("cors"); // 📌 Import cors
 
 // DB Connection
 const connectDB = async () => {
@@ -29,6 +30,16 @@ const Attendance = mongoose.model("Attendance", attendanceSchema);
 // Express setup
 const app = express();
 app.use(bodyParser.json());
+
+// 📌 Enable CORS for all origins
+app.use(cors());
+
+// OR restrict to specific frontend
+// app.use(cors({
+//   origin: "http://localhost:3000", // frontend URL
+//   methods: ["GET", "POST"],
+//   credentials: true
+// }));
 
 // 📌 POST API (Check-in / Check-out)
 app.post("/attendance", async (req, res) => {
@@ -92,7 +103,6 @@ app.get("/attendance", async (req, res) => {
       query.userName = username;
     }
 
-    // latest first
     const records = await Attendance.find(query).sort({ checkInTime: -1 });
 
     return res.status(200).json({ success: true, records });
